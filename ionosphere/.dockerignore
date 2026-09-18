@@ -1,0 +1,12 @@
+# build artifacts
+/server
+/out/
+*.test
+*.out
+
+# local toolchain
+/go/
+
+# version control
+.git/
+.gitignore
