@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: iono
+      POSTGRES_PASSWORD: iono
+      POSTGRES_DB: ionosphere
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iono -d ionosphere"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: "8080"
+      DATABASE_URL: "postgres://iono:iono@db:5432/ionosphere?sslmode=disable"
+      GROUND_ALTITUDE_M: "0"
+      TOP_HEIGHT_M: "1000000"
+      TEC_TOLERANCE: "1e-9"
+      PROFILE_POINTS: "400"
+      MAX_BATCH_SIZE: "500"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  db-data:
